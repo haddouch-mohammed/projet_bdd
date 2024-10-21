@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une séance</title>
+</head>
+<body>
+    <h1>Ajouter une nouvelle séance</h1>
+    <form action="/seances" method="POST">
+        <label for="movieId">Film :</label>
+        <select name="movieId" required>
+            <% movies.forEach(movie => { %>
+                <option value="<%= movie._id %>"><%= movie.title %></option>
+            <% }) %>
+        </select><br>
+    
+        <label for="schedule">Horaire :</label>
+        <input type="datetime-local" name="dateTime" required><br>
+    
+        <label for="room">Salle :</label>
+        <input type="text" name="room" required><br>
+    
+        <label for="capacity">Capacité :</label>
+        <input type="number" name="capacity" required><br>
+    
+        <label for="projectionTechnology">Technologie :</label>
+        <input type="text" name="projectionTechnology" required><br>
+    
+        <label for="ticketPrice">Prix du billet :</label>
+        <input type="number" name="ticketPrice" step="0.01" required><br>
+    
+        <label for="availableSeats">Places disponibles :</label>
+        <input type="number" name="availableSeats" required><br>
+    
+        <label for="onlineAvailability">Réservation en ligne :</label>
+        <input type="checkbox" name="onlineAvailability" value="true"><br>
+    
+        <button type="submit">Ajouter</button>
+    </form>
+    
+</body>
+</html>

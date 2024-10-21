@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un film</title>
+</head>
+<body>
+    <h1>Modifier le film : <%= movie.title %></h1>
+    <form action="/movies/edit/<%= movie._id %>" method="POST" enctype="multipart/form-data">
+        <label for="title">Titre :</label>
+        <input type="text" name="title" value="<%= movie.title %>" required><br><br>
+
+        <label for="releaseYear">Année de sortie :</label>
+        <input type="number" name="releaseYear" value="<%= movie.releaseYear %>"><br><br>
+
+        <label for="duration">Durée (minutes) :</label>
+        <input type="number" name="duration" value="<%= movie.duration %>"><br><br>
+
+        <label for="genre">Genre :</label>
+        <input type="text" name="genre" value="<%= movie.genre %>"><br><br>
+
+        <label for="director">Réalisateur :</label>
+        <input type="text" name="director" value="<%= movie.director %>"><br><br>
+
+        <label for="actors">Acteurs principaux (séparés par une virgule) :</label>
+        <input type="text" name="actors" value="<%= movie.actors.join(', ') %>"><br><br>
+
+        <label for="synopsis">Synopsis :</label>
+        <textarea name="synopsis"><%= movie.synopsis %></textarea><br><br>
+
+        <label for="classification">Classification :</label>
+        <input type="text" name="classification" value="<%= movie.classification %>"><br><br>
+
+        <label for="language">Langue :</label>
+        <input type="text" name="language" value="<%= movie.language %>"><br><br>
+
+        <label for="trailer">Bande-annonce (lien) :</label>
+        <input type="url" name="trailer" value="<%= movie.trailer %>"><br><br>
+
+        <label for="poster">Affiche du film :</label>
+        <input type="file" name="poster"><br>
+        <img src="<%= movie.poster %>" alt="Affiche de <%= movie.title %>" style="max-width: 200px;"><br><br>
+
+        <label for="format">Format :</label>
+        <input type="text" name="format" value="<%= movie.format %>"><br><br>
+
+        <label for="productionStudio">Studio :</label>
+        <input type="text" name="productionStudio" value="<%= movie.productionStudio %>"><br><br>
+
+        <label for="releaseDate">Date de sortie :</label>
+        <input type="date" name="releaseDate" value="<%= movie.releaseDate.toISOString().split('T')[0] %>"><br><br>
+
+        <button type="submit">Modifier</button>
+    </form>
+</body>
+</html>
