@@ -56,11 +56,7 @@
                         </div>
                         <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
                             
-                                        <ul class="top_icon">
-                                            <li class="button_login"><a href="/users">Partie Utilisateur </a> </li>
-                                           
-                                
-                                        </ul>
+                                       
                         </div>
                     </div>
                 </div>
@@ -78,8 +74,7 @@
                                 <div class="limit-box">
                                     <nav class="main-menu">
                                         <ul class="menu-area-main">
-                                            <li><a href="/movies/new">Ajouter un film</a> |  </li>
-                                            <li><a href="/seances/new">Ajouter une séance</a> | </li>
+                                     
                                             <li> <a href="#about">About</a> </li>
                                             <li> <a href="#contact">Contact</a> </li>
                                            
@@ -173,11 +168,9 @@
                                         <p><strong>Genre :</strong> <%= movie.genre %></p>
                                         <p><strong>Réalisateur :</strong> <%= movie.director %></p>
                                         <p><strong>Synopsis :</strong> <%= movie.synopsis %></p>
-                                        <a href="/movies/edit/<%= movie._id %>">Modifier</a>
-                                        <form action="/movies/delete/<%= movie._id %>" method="POST" style="display:inline;">
-                                            <button type="submit">Supprimer</button>
-                                        </form>
-                                        <a href="/seances/movie/<%= movie._id %>">Consulter les séances</a>
+                                      
+                                    
+                                        <a href="/seancesusers/movie/<%= movie._id %>">Consulter les séances</a>
                                     </div>
                                 </div>
                             </div>

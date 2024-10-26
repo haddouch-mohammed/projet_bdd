@@ -5,6 +5,7 @@ const Seance = require('./models/Seance');
 const multer = require('multer');
 const path = require('path');
 
+const Reservation = require('./models/Reservation');
 
 
 
@@ -30,6 +31,40 @@ router.get('/movies/new', (req, res) => {
     res.render('addMovie');
 });
 
+
+
+router.get('/users', async (req, res) => {
+    try {
+        const movies = await Movie.find(); // Récupère tous les films depuis la base de données
+        res.render('users', { movies });
+    } catch (error) {
+        res.status(500).send('Erreur lors de la récupération des films');
+    }
+});
+
+// Route pour soumettre une réservation
+// Route pour afficher la page de réservation pour une séance spécifique
+router.get('/reservation/:seanceId', async (req, res) => {
+    try {
+        const seanceId = req.params.seanceId;
+        
+        // Récupérer la séance à partir de la base de données
+        const seance = await Seance.findById(seanceId);
+        
+        if (!seance) {
+            return res.status(404).send("Séance non trouvée");
+        }
+
+        // Rendre la vue 'reservation' en passant les informations de la séance
+        res.render('reservation', { seance });
+    } catch (error) {
+        console.error("Erreur lors de la récupération de la séance :", error);
+        res.status(500).send("Erreur interne du serveur");
+    }
+});
+
+
+
 // Affiche les séances d'un film spécifique
 router.get('/seances/movie/:id', async (req, res) => {
     const movieId = req.params.id;
@@ -45,6 +80,64 @@ router.get('/seances/movie/:id', async (req, res) => {
         res.status(500).send('Erreur lors de la récupération des séances.');
     }
 });
+
+// Affiche les séances d'un film spécifique
+router.get('/seancesusers/movie/:id', async (req, res) => {
+    const movieId = req.params.id;
+    try {
+        const sessions = await Seance.find({ movieId: movieId }).populate('movieId');
+        // Convertir dateTime en objet Date si nécessaire
+        sessions.forEach(session => {
+            session.dateTime = new Date(session.dateTime);
+        });
+        res.render('sessionsusers', { sessions });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erreur lors de la récupération des séances.');
+    }
+});
+// Route pour soumettre une réservation
+router.post('/submit-reservation', async (req, res) => {
+    try {
+        const { seanceId, seats } = req.body;
+
+        // Vérifier si des sièges ont été fournis
+        if (!seats || !Array.isArray(seats) || seats.length === 0) {
+            return res.status(400).send("Aucun siège fourni.");
+        }
+
+        // Récupérer toutes les réservations pour la séance
+        const existingReservations = await Reservation.find({ seanceId });
+
+        // Extraire tous les sièges réservés
+        const reservedSeats = existingReservations.flatMap(reservation => reservation.seatsReserved);
+
+        // Vérifier si les sièges demandés sont déjà réservés
+        const alreadyReservedSeats = seats.filter(seat => reservedSeats.includes(seat));
+
+        if (alreadyReservedSeats.length > 0) {
+            return res.status(400).json({
+                message: `Les sièges suivants sont déjà réservés : ${alreadyReservedSeats.join(', ')}`,
+                success: false
+            });
+        }
+
+        // Créer une nouvelle réservation
+        const reservation = new Reservation({
+            seanceId: seanceId,
+            seatsReserved: seats.filter(seat => seat) // Exclut les sièges vides
+        });
+
+        await reservation.save();
+        res.send("Réservation effectuée avec succès !");
+    } catch (error) {
+        console.error("Erreur lors de la réservation :", error);
+        res.status(500).send("Erreur interne du serveur");
+    }
+});
+
+
+
 
 router.post('/seances', async (req, res) => {
     const { movieId, dateTime, room, capacity, projectionTechnology, ticketPrice, availableSeats, onlineAvailability } = req.body;
