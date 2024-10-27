@@ -69,17 +69,35 @@ router.get('/reservation/:seanceId', async (req, res) => {
 router.get('/seances/movie/:id', async (req, res) => {
     const movieId = req.params.id;
     try {
+        // Récupérer toutes les séances pour le film donné
         const sessions = await Seance.find({ movieId: movieId }).populate('movieId');
+
+        // Pour chaque séance, compter le nombre total de sièges réservés
+        for (const session of sessions) {
+            // Récupérer toutes les réservations pour cette séance
+            const reservations = await Reservation.find({ seanceId: session._id });
+            
+            // Compter le nombre total de sièges réservés pour cette séance
+            const totalReservedSeats = reservations.reduce((total, reservation) => {
+                return total + (reservation.seatsReserved ? reservation.seatsReserved.length : 0);
+            }, 0);
+
+            // Ajouter le champ `totalReservedSeats` à la séance
+            session.totalReservedSeats = totalReservedSeats;
+        }
+
         // Convertir dateTime en objet Date si nécessaire
         sessions.forEach(session => {
             session.dateTime = new Date(session.dateTime);
         });
+
         res.render('sessions', { sessions });
     } catch (error) {
         console.error(error);
         res.status(500).send('Erreur lors de la récupération des séances.');
     }
 });
+
 
 // Affiche les séances d'un film spécifique
 router.get('/seancesusers/movie/:id', async (req, res) => {
@@ -96,14 +114,14 @@ router.get('/seancesusers/movie/:id', async (req, res) => {
         res.status(500).send('Erreur lors de la récupération des séances.');
     }
 });
-// Route pour soumettre une réservation
+/// Route pour soumettre une réservation
 router.post('/submit-reservation', async (req, res) => {
     try {
         const { seanceId, seats } = req.body;
 
         // Vérifier si des sièges ont été fournis
         if (!seats || !Array.isArray(seats) || seats.length === 0) {
-            return res.status(400).send("Aucun siège fourni.");
+            return res.status(400).json({ message: "Aucun siège fourni.", success: false });
         }
 
         // Récupérer toutes les réservations pour la séance
@@ -129,12 +147,14 @@ router.post('/submit-reservation', async (req, res) => {
         });
 
         await reservation.save();
-        res.send("Réservation effectuée avec succès !");
+        res.json({ message: "Réservation effectuée avec succès !", success: true });
     } catch (error) {
         console.error("Erreur lors de la réservation :", error);
-        res.status(500).send("Erreur interne du serveur");
+        res.status(500).json({ message: "Erreur interne du serveur", success: false });
     }
 });
+
+
 
 
 

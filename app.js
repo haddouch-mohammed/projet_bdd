@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Connexion à MongoDB
 mongoose.connect('mongodb://localhost/movieApp', { useNewUrlParser: true, useUnifiedTopology: true });
-
+app.use(bodyParser.json());
 // Configurations
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));

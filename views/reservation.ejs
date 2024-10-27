@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,13 +24,7 @@
 </head>
 <body>
     <h1>Réservation pour la Séance</h1>
-    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 ">
-        <div class="text-img">
-            
-           <figure><img src="../images/sieges.jpg" alt="#"/></figure>
-        </div>
-    </div>
-
+  
     <p><strong>Date et Heure :</strong> <%= seance.dateTime ? seance.dateTime.toLocaleString() : 'Date non disponible' %></p>
     <p><strong>Salle :</strong> <%= seance.room %></p>
     <p><strong>Prix du billet :</strong> <%= seance.ticketPrice %> €</p>
@@ -89,12 +81,13 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                const result = await response.json(); // Récupérer le résultat JSON
                 if (!response.ok) {
-                    showPopup(result.message);
+                    showPopup(result.message); // Afficher le message d'erreur
                 } else {
-                    alert("Réservation effectuée avec succès !");
+                    showPopup(result.message); // Afficher le message de succès
                 }
+                
             } catch (error) {
                 console.error("Erreur lors de la réservation :", error);
                 showPopup("Erreur interne du serveur");
