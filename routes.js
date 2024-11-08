@@ -4,9 +4,6 @@ const Movie = require('./models/Movie');
 const Seance = require('./models/Seance');
 const multer = require('multer');
 const path = require('path');
-const Review = require('./models/Review.js'); // Add this line
-
-
 
 const Reservation = require('./models/Reservation');
 
@@ -23,38 +20,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
 // Route principale
-//router.get('/', async (req, res) => {
-//    try {
-//        const movies = await Movie.find();
-//        const reviews = await Review.find(); // Fetch all reviews
-//        res.render('index', { movies, reviews }); // Pass both movies and reviews to the view
-//    } catch (error) {
-//        console.error(error);
-//        res.status(500).send('Erreur lors de la récupération des films et des avis.');
-//    }
-//});
-
-
-// Route principale pour afficher tous les films avec la note moyenne
 router.get('/', async (req, res) => {
-    try {
-        const movies = await Movie.aggregate([
-            {
-                $addFields: {
-                    averageRating: { $avg: "$reviews.rating" } // Calcul de la note moyenne
-                }
-            }
-        ]);
-
-        res.render('index', { movies }); // On passe "movies" dans la vue, sans "reviews" séparé
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Erreur lors de la récupération des films avec la note moyenne");
-    }
+    const movies = await Movie.find();
+    res.render('index', { movies });
 });
-
 
 // Formulaire pour ajouter un film
 router.get('/movies/new', (req, res) => {
@@ -95,24 +65,23 @@ router.get('/reservation/:seanceId', async (req, res) => {
 
 
 
-// Affiche les séances d'un film spécifique
 router.get('/seances/movie/:id', async (req, res) => {
     const movieId = req.params.id;
     try {
-        // Récupérer toutes les séances pour le film donné
+        // Récupère toutes les séances pour ce film
         const sessions = await Seance.find({ movieId: movieId }).populate('movieId');
-
-        // Pour chaque séance, compter le nombre total de sièges réservés
-        for (const session of sessions) {
-            // Récupérer toutes les réservations pour cette séance
-            const reservations = await Reservation.find({ seanceId: session._id });
+        
+        // Pour chaque séance, on calcule le nombre total de sièges réservés
+        for (let session of sessions) {
+            const reservations = await Reservation.find({ seanceId: session._id }); // Trouve toutes les réservations pour cette séance
             
-            // Compter le nombre total de sièges réservés pour cette séance
-            const totalReservedSeats = reservations.reduce((total, reservation) => {
-                return total + (reservation.seatsReserved ? reservation.seatsReserved.length : 0);
-            }, 0);
+            let totalReservedSeats = 0;
+            // Pour chaque réservation, ajouter le nombre de sièges réservés
+            reservations.forEach(reservation => {
+                totalReservedSeats += reservation.seatsReserved.length; // Nombre de sièges réservés dans cette réservation
+            });
 
-            // Ajouter le champ `totalReservedSeats` à la séance
+            // Ajoute le nombre total de sièges réservés à l'objet séance
             session.totalReservedSeats = totalReservedSeats;
         }
 
@@ -241,10 +210,9 @@ router.post('/movies', upload.single('poster'), async (req, res) => {
 
 // Formulaire pour modifier un film
 router.get('/movies/edit/:id', async (req, res) => {
-  const movie = await Movie.findById(req.params.id);
-res.render('editMovie', { movie });
+    const movie = await Movie.findById(req.params.id);
+    res.render('editMovie', { movie });
 });
-
 
 // Modifier un film (POST)
 router.post('/movies/edit/:id', upload.single('poster'), async (req, res) => {
@@ -282,46 +250,5 @@ router.get('/seances/new', async (req, res) => {
     const movies = await Movie.find();
     res.render('addSeance', { movies });
 });
-// Ajoute un avis pour un film
-router.post('/movies/:id/review', async (req, res) => {
-    const { userName, rating, comment } = req.body;
-    const movieId = req.params.id;
-
-    try {
-        const movie = await Movie.findById(movieId);
-        if (!movie) return res.status(404).send('Film non trouvé');
-
-        // Ajouter un nouvel avis dans le tableau des avis intégrés
-        movie.reviews.push({ userName: userName || 'Anonymous', rating, comment });
-        await movie.save();
-
-        res.redirect('/');
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Erreur lors de l\'ajout de l\'avis');
-    }
-});
-// Route pour obtenir la note moyenne d'un film
-router.get('/movies/:id/average-rating', async (req, res) => {
-    const movieId = req.params.id;
-
-    try {
-        const averageRating = await Movie.aggregate([
-            { $match: { _id: mongoose.Types.ObjectId(movieId) } },
-            { $unwind: "$reviews" },
-            { $group: { _id: "$_id", averageRating: { $avg: "$reviews.rating" } } }
-        ]);
-
-        if (averageRating.length > 0) {
-            res.json({ averageRating: averageRating[0].averageRating });
-        } else {
-            res.json({ averageRating: null });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Erreur lors du calcul de la note moyenne');
-    }
-});
-
 
 module.exports = router;
