@@ -1,0 +1,9 @@
+<h2>Détails des Notes</h2>
+<p>Moyenne des Notes: <%= movie.averageRating %> / 5</p>
+
+<h3>Détail des Notes :</h3>
+<ul>
+    <% movie.ratingCounts.forEach((ratingDetail) => { %>
+        <li><%= ratingDetail._id %> Étoiles: <%= ratingDetail.count %> avis</li>
+    <% }); %>
+</ul>

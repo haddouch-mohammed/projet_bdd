@@ -4,6 +4,7 @@ const Movie = require('./models/Movie');
 const Seance = require('./models/Seance');
 const multer = require('multer');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const Reservation = require('./models/Reservation');
 
@@ -250,5 +251,68 @@ router.get('/seances/new', async (req, res) => {
     const movies = await Movie.find();
     res.render('addSeance', { movies });
 });
+
+
+// Route pour ajouter un avis
+router.post('/movies/:id/reviews', async (req, res) => {
+    const { id } = req.params;
+    const { userId, comment, rating } = req.body;
+
+    try {
+        const movie = await Movie.findById(id);
+        if (!movie) return res.status(404).send("Film introuvable");
+
+        // Ajouter l'avis sans calculer de moyenne ici
+        movie.reviews.push({ userId, comment, rating });
+        await movie.save();
+
+        // Remplacez cette ligne dans la route POST
+res.redirect('/'); // Redirection vers la page du film après l'ajout
+    } catch (error) {
+        console.error("Erreur lors de l'ajout de la critique :", error);
+        res.status(500).send("Erreur interne du serveur");
+    }
+});
+
+router.get('/movies/:id/rating-details', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await Movie.aggregate([
+            { 
+                $match: { _id: new mongoose.Types.ObjectId(id) } // Filtre pour le film spécifique
+            },
+            { 
+                $unwind: "$reviews" // Sépare chaque avis pour le traitement
+            },
+            { 
+                $group: {
+                    _id: "$reviews.rating", // Grouper par note
+                    count: { $sum: 1 } // Compter le nombre d'avis pour chaque note
+                }
+            },
+            { 
+                $sort: { _id: -1 } // Trier par note décroissante (5 étoiles en premier)
+            }
+        ]);
+
+        // Calcul de la moyenne des notes
+        const avgResult = await Movie.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(id) } },
+            { $unwind: "$reviews" },
+            { $group: { _id: null, averageRating: { $avg: "$reviews.rating" } } }
+        ]);
+
+        const averageRating = avgResult[0]?.averageRating || 0;
+
+        res.render('ratingDetails', { 
+            movie: { averageRating: averageRating.toFixed(2), ratingCounts: result }
+        });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des détails des notes :", error);
+        res.status(500).send("Erreur interne du serveur");
+    }
+});
+
 
 module.exports = router;
