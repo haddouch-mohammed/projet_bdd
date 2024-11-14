@@ -172,24 +172,6 @@
                                         </form>
                                         <a href="/seances/movie/<%= movie._id %>">Consulter les séances</a>
                                         <a href="/movies/<%= movie._id %>/rating-details">Voir les détails des notes</a>
-                                         <!-- Formulaire pour ajouter un avis -->
-                                         <h3>Ajouter un avis</h3>
-                                         <form action="/movies/<%= movie._id %>/reviews" method="POST">
-                                             <label for="comment">Commentaire:</label>
-                                             <textarea name="comment" id="comment"></textarea>
- 
-                                             <label for="rating">Note:</label>
-                                             <select name="rating" id="rating">
-                                                 <option value="1">1 Étoile</option>
-                                                 <option value="2">2 Étoiles</option>
-                                                 <option value="3">3 Étoiles</option>
-                                                 <option value="4">4 Étoiles</option>
-                                                 <option value="5">5 Étoiles</option>
-                                             </select>
- 
-                                             <button type="submit">Soumettre Avis</button>
-                                            </form>
-
                                     </div>
                                 </div>
                             </div>
