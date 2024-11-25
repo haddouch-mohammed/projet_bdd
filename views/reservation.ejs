@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Réservation de la Séance</title>
-    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .hidden {
-            display: none;
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
         }
         .popup {
             position: fixed;
@@ -17,57 +19,76 @@
             transform: translate(-50%, -50%);
             background-color: white;
             padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
+
 <body>
-    <h1>Réservation pour la Séance</h1>
-  
-    <p><strong>Date et Heure :</strong> <%= seance.dateTime ? seance.dateTime.toLocaleString() : 'Date non disponible' %></p>
-    <p><strong>Salle :</strong> <%= seance.room %></p>
-    <p><strong>Prix du billet :</strong> <%= seance.ticketPrice %> €</p>
+    <div class="container mt-5">
+        <div class="card mx-auto" style="max-width: 600px;">
+            <div class="card-body">
+                <h2 class="card-title text-center">Réservation pour la Séance</h2>
+                <p><strong>Date et Heure :</strong> <%= seance.dateTime ? seance.dateTime.toLocaleString() : 'Date non disponible' %></p>
+                <p><strong>Salle :</strong> <%= seance.room %></p>
+                <p><strong>Prix du billet :</strong> <%= seance.ticketPrice %> €</p>
 
-    <!-- Formulaire de réservation -->
-    <form id="reservation-form">
-        <input type="hidden" name="seanceId" value="<%= seance._id %>">
+                <!-- Formulaire de réservation -->
+                <form id="reservation-form" class="mt-4">
+                    <input type="hidden" name="seanceId" value="<%= seance._id %>">
 
-        <div id="seat-container">
-            <label for="seat1">Réservez votre siège 1 :</label>
-            <input type="text" id="seat1" name="seats[]" placeholder="Siège (ex : A20)" required>
+                    <div id="seat-container" class="mb-3">
+                        <label for="seat1" class="form-label">Réservez votre siège 1 :</label>
+                        <input type="text" id="seat1" name="seats[]" class="form-control" placeholder="Siège (ex : A20)" required>
+                    </div>
+
+                    <div id="additional-seats"></div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <button type="button" id="add-seat-button" class="btn btn-outline-primary">Ajouter un autre siège</button>
+                        <button type="submit" class="btn btn-primary">Finaliser la réservation</button>
+                    </div>
+                </form>
+
+                <div class="mt-3">
+                    <a href="/users" class="btn btn-link">Retour à la liste des séances</a>
+                </div>
+            </div>
         </div>
-
-        <div id="additional-seats"></div>
-
-        <button type="button" id="add-seat-button">Ajouter un autre siège</button>
-        <button type="submit">Finaliser la réservation</button>
-    </form>
-
-    <a href="/users">Retour à la liste des séances</a>
-
-    <!-- Pop-up pour les messages d'erreur -->
-    <div id="error-popup" class="popup hidden">
-        <p id="error-message"></p>
-        <button onclick="closePopup()">Fermer</button>
     </div>
 
+    <!-- Pop-up pour les messages -->
+    <div id="error-popup" class="popup hidden">
+        <p id="error-message" class="mb-3"></p>
+        <button onclick="closePopup()" class="btn btn-secondary">Fermer</button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let seatCount = 1; // Compteur pour les sièges
 
-        document.getElementById('add-seat-button').addEventListener('click', function() {
+        document.getElementById('add-seat-button').addEventListener('click', function () {
             seatCount++;
             const additionalSeatsDiv = document.getElementById('additional-seats');
             const newSeatInput = document.createElement('div');
+            newSeatInput.className = "mb-3";
             newSeatInput.innerHTML = `
-                <label for="seat${seatCount}">Réservez votre siège ${seatCount} :</label>
-                <input type="text" id="seat${seatCount}" name="seats[]" placeholder="Siège (ex : A21)" required>
+                <label for="seat${seatCount}" class="form-label">Réservez votre siège ${seatCount} :</label>
+                <input type="text" id="seat${seatCount}" name="seats[]" class="form-control" placeholder="Siège (ex : A21)" required>
             `;
             additionalSeatsDiv.appendChild(newSeatInput);
         });
 
         // Gestionnaire de soumission du formulaire
-        document.getElementById('reservation-form').addEventListener('submit', async function(event) {
+        document.getElementById('reservation-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const formData = new FormData(this);
@@ -81,20 +102,20 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json(); // Récupérer le résultat JSON
+                const result = await response.json();
                 if (!response.ok) {
                     showPopup(result.message); // Afficher le message d'erreur
                 } else {
                     showPopup(result.message); // Afficher le message de succès
                 }
-                
+
             } catch (error) {
                 console.error("Erreur lors de la réservation :", error);
                 showPopup("Erreur interne du serveur");
             }
         });
 
-        // Afficher la pop-up d'erreur
+        // Afficher la pop-up
         function showPopup(message) {
             const popup = document.getElementById('error-popup');
             const errorMessage = document.getElementById('error-message');
@@ -102,11 +123,12 @@
             popup.classList.remove('hidden');
         }
 
-        // Fermer la pop-up d'erreur
+        // Fermer la pop-up
         function closePopup() {
             const popup = document.getElementById('error-popup');
             popup.classList.add('hidden');
         }
     </script>
 </body>
+
 </html>

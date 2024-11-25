@@ -22,10 +22,77 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route principale
-router.get('/', async (req, res) => {
+/*router.get('/', async (req, res) => {
     const movies = await Movie.find();
     res.render('index', { movies });
+});*/
+
+
+router.get('/', async (req, res) => {
+    // Récupérer les films avec l'agrégation
+    const moviesWithRevenue = await Movie.aggregate([
+        {
+            $lookup: {
+                from: 'seances', // Nom de la collection des séances
+                localField: '_id',
+                foreignField: 'movieId',
+                as: 'seances'
+            }
+        },
+        {
+            $unwind: {
+                path: '$seances',
+                preserveNullAndEmptyArrays: true // Permet de gérer les films sans séances
+            }
+        },
+        {
+            $lookup: {
+                from: 'reservations', // Nom de la collection des réservations
+                localField: 'seances._id',
+                foreignField: 'seanceId',
+                as: 'reservations'
+            }
+        },
+        {
+            $addFields: {
+                totalRevenue: {
+                    $sum: {
+                        $map: {
+                            input: '$reservations',
+                            as: 'reservation',
+                            in: {
+                                $multiply: [
+                                    { $size: '$$reservation.seatsReserved' }, // Nombre de sièges réservés
+                                    '$seances.ticketPrice' // Prix du ticket de la séance
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                title: { $first: '$title' },
+                releaseYear: { $first: '$releaseYear' },
+                genre: { $first: '$genre' },
+                director: { $first: '$director' },
+                synopsis: { $first: '$synopsis' },
+                poster: { $first: '$poster' },
+                totalRevenue: { $sum: '$totalRevenue' } // Additionner les revenus des séances
+            }
+        }
+    ]);
+
+    // Passer les résultats à la vue
+    res.render('index', { movies: moviesWithRevenue });
 });
+
+
+
+
+
 
 // Formulaire pour ajouter un film
 router.get('/movies/new', (req, res) => {
@@ -42,6 +109,8 @@ router.get('/users', async (req, res) => {
         res.status(500).send('Erreur lors de la récupération des films');
     }
 });
+
+
 
 // Route pour soumettre une réservation
 // Route pour afficher la page de réservation pour une séance spécifique
@@ -64,39 +133,113 @@ router.get('/reservation/:seanceId', async (req, res) => {
     }
 });
 
-
-
+/*
 router.get('/seances/movie/:id', async (req, res) => {
     const movieId = req.params.id;
-    try {
-        // Récupère toutes les séances pour ce film
-        const sessions = await Seance.find({ movieId: movieId }).populate('movieId');
-        
-        // Pour chaque séance, on calcule le nombre total de sièges réservés
-        for (let session of sessions) {
-            const reservations = await Reservation.find({ seanceId: session._id }); // Trouve toutes les réservations pour cette séance
-            
-            let totalReservedSeats = 0;
-            // Pour chaque réservation, ajouter le nombre de sièges réservés
-            reservations.forEach(reservation => {
-                totalReservedSeats += reservation.seatsReserved.length; // Nombre de sièges réservés dans cette réservation
-            });
 
-            // Ajoute le nombre total de sièges réservés à l'objet séance
-            session.totalReservedSeats = totalReservedSeats;
+    try {
+        // Vérifiez si l'ID du film est valide
+        if (!mongoose.Types.ObjectId.isValid(movieId)) {
+            return res.status(400).send('ID du film invalide.');
         }
 
-        // Convertir dateTime en objet Date si nécessaire
+        const sessions = await Seance.aggregate([
+            {
+                $match: { movieId: new mongoose.Types.ObjectId(movieId) } // Filtrer par l'ID du film
+            },
+            {
+                $lookup: {
+                    from: 'reservations', // Nom de la collection des réservations
+                    localField: '_id', // Lien depuis Seance
+                    foreignField: 'seanceId', // Lien dans Reservation
+                    as: 'reservations' // Alias pour les données liées
+                }
+            },
+            {
+                $addFields: {
+                    totalReservedSeats: {
+                        $sum: {
+                            $map: {
+                                input: '$reservations', // Parcourir les réservations
+                                as: 'reservation',
+                                in: { $size: '$$reservation.seatsReserved' } // Compte les sièges réservés
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+
+        if (!sessions || sessions.length === 0) {
+            return res.status(404).send('Aucune séance trouvée pour ce film.');
+        }
+
         sessions.forEach(session => {
             session.dateTime = new Date(session.dateTime);
         });
 
         res.render('sessions', { sessions });
     } catch (error) {
-        console.error(error);
+        console.error("Erreur complète :", error);
+        res.status(500).send('Erreur lors de la récupération des séances.');
+    }
+});*/
+
+
+
+router.get('/seances/movie/:id', async (req, res) => {
+    const movieId = req.params.id;
+
+    try {
+        // Vérifiez si l'ID du film est valide
+        if (!mongoose.Types.ObjectId.isValid(movieId)) {
+            return res.status(400).send('ID du film invalide.');
+        }
+
+        const sessions = await Seance.aggregate([
+            {
+                $match: { movieId: new mongoose.Types.ObjectId(movieId) } // Filtrer par l'ID du film
+            },
+            {
+                $lookup: {
+                    from: 'reservations', // Nom de la collection des réservations
+                    localField: '_id', // Lien depuis Seance
+                    foreignField: 'seanceId', // Lien dans Reservation
+                    as: 'reservations' // Alias pour les données liées
+                }
+            },
+            {
+                $addFields: {
+                    totalReservedSeats: {
+                        $sum: {
+                            $map: {
+                                input: '$reservations', // Parcourir les réservations
+                                as: 'reservation',
+                                in: { $size: '$$reservation.seatsReserved' } // Compte les sièges réservés
+                            }
+                        }
+                    },
+                    revenue: { $multiply: [{ $sum: { $map: { input: '$reservations', as: 'reservation', in: { $size: '$$reservation.seatsReserved' } } } }, '$ticketPrice'] }
+                }
+            }
+        ]);
+
+        if (!sessions || sessions.length === 0) {
+            return res.status(404).send('Aucune séance trouvée pour ce film.');
+        }
+
+        sessions.forEach(session => {
+            session.dateTime = new Date(session.dateTime);
+        });
+
+        res.render('sessions', { sessions });
+    } catch (error) {
+        console.error("Erreur complète :", error);
         res.status(500).send('Erreur lors de la récupération des séances.');
     }
 });
+
+
 
 
 // Affiche les séances d'un film spécifique

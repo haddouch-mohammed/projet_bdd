@@ -4,40 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajouter une séance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Ajouter une nouvelle séance</h1>
-    <form action="/seances" method="POST">
-        <label for="movieId">Film :</label>
-        <select name="movieId" required>
-            <% movies.forEach(movie => { %>
-                <option value="<%= movie._id %>"><%= movie.title %></option>
-            <% }) %>
-        </select><br>
+    <form action="/seances" method="POST" class="needs-validation" novalidate>
+        <h2 class="text-center mb-4">Ajouter une nouvelle séance</h2>
+        
+        <div class="mb-3">
+            <label for="movieId" class="form-label">Film :</label>
+            <select name="movieId" class="form-select" required>
+                <% movies.forEach(movie => { %>
+                    <option value="<%= movie._id %>"><%= movie.title %></option>
+                <% }) %>
+            </select>
+        </div>
     
-        <label for="schedule">Horaire :</label>
-        <input type="datetime-local" name="dateTime" required><br>
+        <div class="mb-3">
+            <label for="schedule" class="form-label">Horaire :</label>
+            <input type="datetime-local" name="dateTime" class="form-control" required>
+        </div>
     
-        <label for="room">Salle :</label>
-        <input type="text" name="room" required><br>
+        <div class="mb-3">
+            <label for="room" class="form-label">Salle :</label>
+            <input type="text" name="room" class="form-control" required>
+        </div>
     
-        <label for="capacity">Capacité :</label>
-        <input type="number" name="capacity" required><br>
+        <div class="mb-3">
+            <label for="capacity" class="form-label">Capacité :</label>
+            <input type="number" name="capacity" class="form-control" required>
+        </div>
     
-        <label for="projectionTechnology">Technologie :</label>
-        <input type="text" name="projectionTechnology" required><br>
+        <div class="mb-3">
+            <label for="projectionTechnology" class="form-label">Technologie :</label>
+            <input type="text" name="projectionTechnology" class="form-control" required>
+        </div>
     
-        <label for="ticketPrice">Prix du billet :</label>
-        <input type="number" name="ticketPrice" step="0.01" required><br>
+        <div class="mb-3">
+            <label for="ticketPrice" class="form-label">Prix du billet :</label>
+            <input type="number" name="ticketPrice" class="form-control" step="0.01" required>
+        </div>
     
-        <label for="availableSeats">Places disponibles :</label>
-        <input type="number" name="availableSeats" required><br>
+        <div class="mb-3">
+            <label for="availableSeats" class="form-label">Places disponibles :</label>
+            <input type="number" name="availableSeats" class="form-control" required>
+        </div>
     
-        <label for="onlineAvailability">Réservation en ligne :</label>
-        <input type="checkbox" name="onlineAvailability" value="true"><br>
+        <div class="form-check mb-3">
+            <input type="checkbox" name="onlineAvailability" value="true" class="form-check-input" id="onlineAvailability">
+            <label for="onlineAvailability" class="form-check-label">Réservation en ligne</label>
+        </div>
     
-        <button type="submit">Ajouter</button>
+        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
     </form>
-    
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

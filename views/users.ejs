@@ -105,61 +105,102 @@
         </div>
     </header>
 
-    <!-- our -->
-    <div id="games" class="our">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="titlepage">
-                        <h2>Our Movies</h2>
-                    </div>
+  <!-- Our Movies Section -->
+<div id="games" class="our">
+    <div class="container">
+        <!-- Title -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="titlepage text-center">
+                    <h2>Our Movies</h2>
                 </div>
             </div>
-            <div class="row">
+        </div>
+        <!-- Movies List -->
+        <div class="row">
+            <style>
+                .movie-container {
+                    border: 1px solid #ddd; /* Bordure autour de chaque film */
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    border-radius: 10px; /* Coins arrondis */
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+                }
 
+                .movie-container img {
+                    width: 100%;
+                    height: auto;
+                    max-height: 400px;
+                    object-fit: cover;
+                    border-radius: 10px; /* Coins arrondis pour l'image */
+                }
 
+                .movie-container h3 {
+                    font-size: 1.5rem;
+                    margin-top: 10px;
+                }
 
+                .movie-buttons {
+                    margin-top: 20px;
+                }
 
+                .movie-buttons a,
+                .movie-buttons form button {
+                    margin-right: 10px;
+                }
 
+                /* Form Styling */
+                .review-form {
+                    margin-top: 20px;
+                    padding: 15px;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
+                .review-form label {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: bold;
+                }
 
-                <style>
-                    .movie-container {
-                        border: 1px solid #ddd; /* Bordure autour de chaque film */
-                        padding: 15px;
-                        margin-bottom: 20px;
-                        border-radius: 10px; /* Coins arrondis pour un look plus propre */
-                    }
-                
-                    .movie-container img {
-                        width: 100%; /* Taille de l'image à 100% de la colonne */
-                        height: auto; /* Maintenir le ratio de l'image */
-                        max-height: 400px; /* Limite la hauteur si nécessaire */
-                        object-fit: cover; /* Ajuste l'image pour couvrir l'espace sans déformation */
-                    }
-                
-                    .Games p {
-                        line-height: 1.5; /* Réduire l'espace entre les lignes */
-                    }
-                
-                    .margin_bottom {
-                        margin-bottom: 20px; /* Ajuster la marge entre les films */
-                    }
-                </style>
-                
-                <div class="container">
-                    <% if (movies.length > 0) { %>
-                        <% movies.forEach(movie => { %>
-                        <div class="col-md-12 margin_bottom movie-container"> <!-- Conteneur avec bordure -->
+                .review-form textarea,
+                .review-form select {
+                    width: 100%;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                }
+
+                .review-form button {
+                    padding: 10px 20px;
+                    background-color: #28a745;
+                    border: none;
+                    color: white;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+
+                .review-form button:hover {
+                    background-color: #218838;
+                }
+            </style>
+
+            <div class="container">
+                <% if (movies.length > 0) { %>
+                    <% movies.forEach(movie => { %>
+                        <div class="col-md-12 movie-container">
                             <div class="row">
+                                <!-- Movie Poster -->
                                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-                                    <div class="two-box">
-                                        <% if (movie.poster) { %>
-                                        <figure><img src="<%= movie.poster %>" alt="Affiche de <%= movie.title %>"></figure> <!-- Taille de l'image ajustée -->
-                                        <% } %>
-                                    </div>
+                                    <% if (movie.poster) { %>
+                                        <figure>
+                                            <img src="<%= movie.poster %>" alt="Affiche de <%= movie.title %>">
+                                        </figure>
+                                    <% } %>
                                 </div>
-                
+                                <!-- Movie Details -->
                                 <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
                                     <div class="Games">
                                         <h3><%= movie.title %></h3>
@@ -168,67 +209,46 @@
                                         <p><strong>Genre :</strong> <%= movie.genre %></p>
                                         <p><strong>Réalisateur :</strong> <%= movie.director %></p>
                                         <p><strong>Synopsis :</strong> <%= movie.synopsis %></p>
-                                        <!-- Formulaire pour ajouter un avis -->
-                                        <h3>Ajouter un avis</h3>
-                                        <form action="/movies/<%= movie._id %>/reviews" method="POST">
-                                            <label for="comment">Commentaire:</label>
-                                            <textarea name="comment" id="comment"></textarea>
 
-                                            <label for="rating">Note:</label>
-                                            <select name="rating" id="rating">
-                                                <option value="1">1 Étoile</option>
-                                                <option value="2">2 Étoiles</option>
-                                                <option value="3">3 Étoiles</option>
-                                                <option value="4">4 Étoiles</option>
-                                                <option value="5">5 Étoiles</option>
-                                            </select>
+                                        <!-- Form to add a review -->
+                                        <div class="review-form">
+                                            <h4>Ajouter un avis</h4>
+                                            <form action="/movies/<%= movie._id %>/reviews" method="POST">
+                                                <label for="comment">Commentaire:</label>
+                                                <textarea name="comment" id="comment" rows="4"></textarea>
 
-                                            <button type="submit">Soumettre Avis</button>
-                                           </form>
-                                    
-                                        <a href="/seancesusers/movie/<%= movie._id %>">Consulter les séances</a>
-                                        <a href="/movies/<%= movie._id %>/rating-details">Voir les détails des notes</a>
+                                                <label for="rating">Note:</label>
+                                                <select name="rating" id="rating">
+                                                    <option value="1">1 Étoile</option>
+                                                    <option value="2">2 Étoiles</option>
+                                                    <option value="3">3 Étoiles</option>
+                                                    <option value="4">4 Étoiles</option>
+                                                    <option value="5">5 Étoiles</option>
+                                                </select>
+
+                                                <button type="submit">Soumettre Avis</button>
+                                            </form>
+                                        </div>
+
+                                        <!-- Buttons for movie actions -->
+                                        <div class="movie-buttons">
+                                            <a href="/seancesusers/movie/<%= movie._id %>" class="btn btn-primary btn-sm">Consulter les séances</a>
+                                            <a href="/movies/<%= movie._id %>/rating-details" class="btn btn-info btn-sm">Voir les détails des notes</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <% }) %>
-                    <% } else { %>
-                        <p>Aucun film disponible.</p>
-                    <% } %>
-                </div>
-                
-
-
-
-
-
-
-
-
-
-
-
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-center">Aucun film disponible.</p>
+                <% } %>
             </div>
         </div>
     </div>
-   
-    <!-- end our -->
+</div>
+<!-- End Our Movies Section -->
+
 
     <!-- about  -->
     <div id="about" class="about">

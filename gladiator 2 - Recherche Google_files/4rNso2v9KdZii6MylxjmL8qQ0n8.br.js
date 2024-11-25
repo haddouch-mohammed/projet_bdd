@@ -1,0 +1,1 @@
+var WPTMagContVis;(function(){function t(){const t=n.querySelectorAll(".cnt_vis_hid");t&&Array.prototype.forEach.call(t,function(n){Lib.CssClass.remove(n,"cnt_vis_hid")})}function i(){n&&(n.offsetLeft>9?t():(sj_be(n,"scroll",t),sj_evt.bind("onP1",t,!0,1e3)))}const n=sj_b.querySelector("#b_wpt_container .b_viewport");i()})(WPTMagContVis||(WPTMagContVis={}))

@@ -1,45 +1,107 @@
-<form action="/movies" method="POST" enctype="multipart/form-data">
-    <label for="title">Titre :</label>
-    <input type="text" name="title" required><br>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un film</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 190vh;
+            background-color: #f8f9fa;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <form action="/movies" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <h2 class="text-center mb-4">Ajouter un film</h2>
+        
+        <div class="mb-3">
+            <label for="title" class="form-label">Titre :</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
 
-    <label for="releaseYear">Année de sortie :</label>
-    <input type="number" name="releaseYear"><br>
+        <div class="mb-3">
+            <label for="releaseYear" class="form-label">Année de sortie :</label>
+            <input type="number" name="releaseYear" class="form-control">
+        </div>
 
-    <label for="duration">Durée (minutes) :</label>
-    <input type="number" name="duration"><br>
+        <div class="mb-3">
+            <label for="duration" class="form-label">Durée (minutes) :</label>
+            <input type="number" name="duration" class="form-control">
+        </div>
 
-    <label for="genre">Genre :</label>
-    <input type="text" name="genre"><br>
+        <div class="mb-3">
+            <label for="genre" class="form-label">Genre :</label>
+            <input type="text" name="genre" class="form-control">
+        </div>
 
-    <label for="director">Réalisateur :</label>
-    <input type="text" name="director"><br>
+        <div class="mb-3">
+            <label for="director" class="form-label">Réalisateur :</label>
+            <input type="text" name="director" class="form-control">
+        </div>
 
-    <label for="actors">Acteurs principaux :</label>
-    <input type="text" name="actors"><br>
+        <div class="mb-3">
+            <label for="actors" class="form-label">Acteurs principaux :</label>
+            <input type="text" name="actors" class="form-control">
+        </div>
 
-    <label for="synopsis">Synopsis :</label>
-    <textarea name="synopsis"></textarea><br>
+        <div class="mb-3">
+            <label for="synopsis" class="form-label">Synopsis :</label>
+            <textarea name="synopsis" class="form-control"></textarea>
+        </div>
 
-    <label for="classification">Classification :</label>
-    <input type="text" name="classification"><br>
+        <div class="mb-3">
+            <label for="classification" class="form-label">Classification :</label>
+            <input type="text" name="classification" class="form-control">
+        </div>
 
-    <label for="language">Langue :</label>
-    <input type="text" name="language"><br>
+        <div class="mb-3">
+            <label for="language" class="form-label">Langue :</label>
+            <input type="text" name="language" class="form-control">
+        </div>
 
-    <label for="trailer">Bande-annonce (lien) :</label>
-    <input type="url" name="trailer"><br>
+        <div class="mb-3">
+            <label for="trailer" class="form-label">Bande-annonce (lien) :</label>
+            <input type="url" name="trailer" class="form-control">
+        </div>
 
-    <label for="poster">Affiche du film :</label>
-    <input type="file" name="poster"><br>
+        <div class="mb-3">
+            <label for="poster" class="form-label">Affiche du film :</label>
+            <input type="file" name="poster" class="form-control">
+        </div>
 
-    <label for="format">Format :</label>
-    <input type="text" name="format"><br>
+        <div class="mb-3">
+            <label for="format" class="form-label">Format :</label>
+            <input type="text" name="format" class="form-control">
+        </div>
 
-    <label for="productionStudio">Studio :</label>
-    <input type="text" name="productionStudio"><br>
+        <div class="mb-3">
+            <label for="productionStudio" class="form-label">Studio :</label>
+            <input type="text" name="productionStudio" class="form-control">
+        </div>
 
-    <label for="releaseDate">Date de sortie :</label>
-    <input type="date" name="releaseDate"><br>
+        <div class="mb-3">
+            <label for="releaseDate" class="form-label">Date de sortie :</label>
+            <input type="date" name="releaseDate" class="form-control">
+        </div>
 
-    <button type="submit">Ajouter</button>
-</form>
+        <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+    </form>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
