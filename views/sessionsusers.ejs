@@ -33,7 +33,7 @@
     <div class="container">
         <h1 class="text-center my-4">Sessions pour le film</h1>
         <div class="text-center mb-4">
-            <a href="/" class="btn btn-secondary">Retour à la liste des films</a>
+            <a href="/users" class="btn btn-secondary">Retour à la liste des films</a>
         </div>
 
         <h2 class="mb-3">Liste des séances :</h2>
@@ -50,7 +50,7 @@
                         <p><strong>Technologie de projection :</strong> <%= session.projectionTechnology %></p>
                         <p><strong>Prix du billet :</strong> <%= session.ticketPrice %> €</p>
                         <p><strong>Places disponibles :</strong> <%= session.availableSeats %></p>
-                        <p><strong>Disponibilité en ligne :</strong> <%= session.onlineAvailability ? 'Oui' : 'Non' %></p>
+                       
                         <div class="text-end">
                             <a href="/reservation/<%= session._id %>" class="btn btn-primary">Réserver</a>
                         </div>
