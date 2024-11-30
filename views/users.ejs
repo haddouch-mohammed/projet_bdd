@@ -151,7 +151,9 @@
                 .movie-buttons form button {
                     margin-right: 10px;
                 }
-
+                #rating {
+                    display: none;
+                }
                 /* Form Styling */
                 .review-form {
                     margin-top: 20px;
@@ -213,25 +215,36 @@
                                         <p><strong>Réalisateur :</strong> <%= movie.director %></p>
                                         <p><strong>Synopsis :</strong> <%= movie.synopsis %></p>
 
-                                        <!-- Form to add a review -->
                                         <div class="review-form">
                                             <h4>Ajouter un avis</h4>
                                             <form action="/movies/<%= movie._id %>/reviews" method="POST">
-                                                <label for="comment">Commentaire:</label>
-                                                <textarea name="comment" id="comment" rows="4"></textarea>
-
-                                                <label for="rating">Note:</label>
-                                                <select name="rating" id="rating">
+                                                <!-- Commentaire -->
+                                                <label for="comment">Commentaire (facultatif) :</label>
+                                                <textarea name="comment" id="comment" rows="4" placeholder="Laissez un commentaire (facultatif)"></textarea>
+                                                
+                                                <!-- Note -->
+                                                <label for="rating">Note :</label>
+                                                <select name="rating" id="rating" required>
+                                                    <option value="" disabled selected>Choisir une note</option>
                                                     <option value="1">1 Étoile</option>
                                                     <option value="2">2 Étoiles</option>
                                                     <option value="3">3 Étoiles</option>
                                                     <option value="4">4 Étoiles</option>
                                                     <option value="5">5 Étoiles</option>
                                                 </select>
-
+                                                
+                                                <!-- Bouton Soumettre -->
                                                 <button type="submit">Soumettre Avis</button>
                                             </form>
                                         </div>
+                                        
+                                        
+                                        
+                                                <!-- Bouton pour soumettre le formulaire -->
+                                                
+                                            </form>
+                                        </div>
+                                        
 
                                         <!-- Buttons for movie actions -->
                                         <div class="movie-buttons">

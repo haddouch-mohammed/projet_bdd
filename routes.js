@@ -396,45 +396,57 @@ router.get('/seances/new', async (req, res) => {
 });
 
 
-// Route pour ajouter un avis
 router.post('/movies/:id/reviews', async (req, res) => {
     const { id } = req.params;
     const { userId, comment, rating } = req.body;
 
     try {
-        const movie = await Movie.findById(id);
-        if (!movie) return res.status(404).send("Film introuvable");
+        // Vérifiez que la note est valide
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).send("La note est obligatoire et doit être comprise entre 1 et 5.");
+        }
 
-        // Ajouter l'avis sans calculer de moyenne ici
-        movie.reviews.push({ userId, comment, rating });
+        const movie = await Movie.findById(id);
+        if (!movie) {
+            return res.status(404).send("Film introuvable");
+        }
+
+        // Ajouter l'avis sans obliger à fournir un commentaire
+        movie.reviews.push({
+            userId,
+            comment: comment?.trim() || null, // Si le commentaire est vide, on enregistre `null`
+            rating
+        });
         await movie.save();
 
-        // Remplacez cette ligne dans la route POST
-res.redirect('/'); // Redirection vers la page du film après l'ajout
+        res.redirect('/'); // Redirection vers la page principale après l'ajout
     } catch (error) {
         console.error("Erreur lors de l'ajout de la critique :", error);
         res.status(500).send("Erreur interne du serveur");
     }
 });
 
+
 router.get('/movies/:id/rating-details', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await Movie.aggregate([
-            { 
-                $match: { _id: new mongoose.Types.ObjectId(id) } // Filtre pour le film spécifique
+        // Récupérer les détails des avis (note et nombre d'avis par note)
+        const ratingDetails = await Movie.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(id) }
             },
-            { 
+            {
                 $unwind: "$reviews" // Sépare chaque avis pour le traitement
             },
-            { 
+            {
                 $group: {
                     _id: "$reviews.rating", // Grouper par note
-                    count: { $sum: 1 } // Compter le nombre d'avis pour chaque note
+                    count: { $sum: 1 }, // Compter le nombre d'avis pour chaque note
+                    comments: { $push: "$reviews.comment" } // Récupérer les commentaires associés
                 }
             },
-            { 
+            {
                 $sort: { _id: -1 } // Trier par note décroissante (5 étoiles en premier)
             }
         ]);
@@ -448,8 +460,11 @@ router.get('/movies/:id/rating-details', async (req, res) => {
 
         const averageRating = avgResult[0]?.averageRating || 0;
 
-        res.render('ratingDetails', { 
-            movie: { averageRating: averageRating.toFixed(2), ratingCounts: result }
+        res.render('ratingDetails', {
+            movie: {
+                averageRating: averageRating.toFixed(2),
+                ratingDetails: ratingDetails // Inclure les détails des avis avec commentaires
+            }
         });
     } catch (error) {
         console.error("Erreur lors de la récupération des détails des notes :", error);
